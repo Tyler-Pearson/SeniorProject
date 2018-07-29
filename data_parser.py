@@ -8,6 +8,14 @@ YEAR_START = 1979
 YEAR_END = 2017
 
 
+def list_comp(l1, l2):
+   if not (len(l1) == len(l2)):
+      return False
+   for i in range(len(l1)):
+      if not (l1[i] == l2[i]):
+         return False
+   return True
+
 def verify_cols():
    print("\nExpected Column Headings:")
    filename_end = str(YEAR_END) + XL_EXT
@@ -20,7 +28,7 @@ def verify_cols():
       filename_cur = str(i) + XL_EXT
       df_cur = pd.read_excel(filename_cur)
       col_cur = df_cur.columns
-      if (col_cur.all(col_correct)):
+      if (list_comp(col_cur, col_correct)):
          print("   " + filename_cur + " verified.")
       else:
          print(filename_cur + "incorrect:")
