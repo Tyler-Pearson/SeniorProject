@@ -5,6 +5,7 @@ from stats import *
 
 
 # Defines
+XL_PATH = '.\\Stats\\'
 XL_EXT = '.xlsx'
 YEAR_START = 1979
 YEAR_END = 2017
@@ -26,7 +27,7 @@ def list_comp(l1, l2):
 def verify_cols():
    invalids = []
    print("\nExpected Column Headings:")
-   filename_end = str(YEAR_END) + XL_EXT
+   filename_end = XL_PATH + str(YEAR_END) + XL_EXT
    # read in data file of most recent year
    df_correct = pd.read_excel(filename_end)
    # read in column headers
@@ -36,7 +37,7 @@ def verify_cols():
    print("Cross-verifying all years:")
    # iterate through all season xlsx files
    for i in range(YEAR_START, YEAR_END):
-      filename_cur = str(i) + XL_EXT
+      filename_cur = XL_PATH + str(i) + XL_EXT
       # get file data
       df_cur = pd.read_excel(filename_cur)
       # get column headers
