@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import ExcelWriter
 from pandas import ExcelFile
-import stats
+from stats import *
 
 
 # Defines
