@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas import ExcelWriter
 from pandas import ExcelFile
+import shelve
 from stats import *
 
 
@@ -22,6 +23,7 @@ def list_comp(l1, l2):
          return False
    return True
 
+
 # Verify the column headers of all season xlsx files against
 # most recent. Assumes most recent has correct headers
 def verify_cols():
@@ -36,8 +38,8 @@ def verify_cols():
 
    print("Cross-verifying all years:")
    # iterate through all season xlsx files
-   for i in range(YEAR_START, YEAR_END):
-      filename_cur = XL_PATH + str(i) + XL_EXT
+   for year in range(YEAR_START, YEAR_END):
+      filename_cur = XL_PATH + str(year) + XL_EXT
       # get file data
       df_cur = pd.read_excel(filename_cur)
       # get column headers
@@ -58,13 +60,36 @@ def verify_cols():
       return True
 
 
+# Iterate through each row in each xlsx season,
+# add row (player season) to player store,
+# and finally shelve player store
+def generate_playerStore():
+   print("let's create and shelve a player store")
+   store = PlayerStore() # data store for shelving
+   # iterate through all season xlsx files
+   for year in range(YEAR_START, YEAR_END + 1):
+      df = pd.read_excel(XL_PATH + str(year) + XL_EXT)
+      # iterate through rows, add season to store
+      for i, p in df.iterrows():
+         season = Season(p['Age'], p['G'], p['MP'], p['FGA'], p['FG%'],
+                           p['3PA'], p['3P%'], p['2PA'], p['2P%'], p['FTA'],
+                           p['FT%'], p['ORB'], p['DRB'], p['AST'], p['STL'],
+                           p['BLK'], p['TOV'], p['PF'], p['PS/G'])
+         store.addSeason(p['Player'], season)
+   # Shelve player store
+   ps = shelve.open('player_store')
+   ps['store'] = store
+   ps.close()
+
+
 # main
 def main():
    print("\nhi. let's parse")
-   if not (verify_cols()):
-      print("Fix invalid headers\n")
-      return
-   print("\n")
+
+   #verify_cols()
+
+   generate_playerStore()
+   print()
 
 
 if __name__ == "__main__":

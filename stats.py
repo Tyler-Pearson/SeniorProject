@@ -51,7 +51,7 @@ class PlayerStore:
       if (name in self.players):
          ind = self.players.index(name)
          self.players[ind].seasons.append(season)
-         print("Adding season to end of " + name)
+         #print("Adding season to end of " + name)
       else:
          self.players.append(Player(name, season))
-         print("Adding player " + name + " to PlayerStore")
+         #print("Adding player " + name + " to PlayerStore")
