@@ -76,7 +76,11 @@ def generate_playerStore():
                            p['FT%'], p['ORB'], p['DRB'], p['AST'], p['STL'],
                            p['BLK'], p['TOV'], p['PF'], p['PS/G'])
          store.addSeason(p['Player'], season)
+   # Set max seasons for players in player store
+   print("All players parsed, setting maxes") # for debugging
+   store.setMaxes()
    # Shelve player store
+   print("Player maxes set, shelving data obj") # for debugging
    ps = shelve.open('player_store')
    ps['store'] = store
    ps.close()

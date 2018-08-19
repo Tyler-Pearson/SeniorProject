@@ -31,11 +31,40 @@ class Player:
    def __init__(self, name, rookie_season):
       self.name = name
       self.seasons = [rookie_season]
+      if '*' in name:
+         self.hof = True
+      else:
+         self.hof = False
 
    # Compares Player against String - to avoid needing to create
    # a new Player object while adding a season to PlayerStore
    def __eq__(self, other):
       return (self.name == other)
+      
+   # Set self.max_season to a Season object of the best stat in
+   # each statistical category of the player's seasons
+   def setMaxSeason(self):
+      self.max_season = Season(
+         max(season.age for season in self.seasons),
+         max(season.g for season in self.seasons),
+         max(season.mp for season in self.seasons),
+         max(season.fga for season in self.seasons),
+         max(season.fgp for season in self.seasons),
+         max(season.threepa for season in self.seasons),
+         max(season.threepp for season in self.seasons),
+         max(season.twopa for season in self.seasons),
+         max(season.twopp for season in self.seasons),
+         max(season.fta for season in self.seasons),
+         max(season.ftp for season in self.seasons),
+         max(season.orb for season in self.seasons),
+         max(season.drb for season in self.seasons),
+         max(season.ast for season in self.seasons),
+         max(season.stl for season in self.seasons),
+         max(season.blk for season in self.seasons),
+         max(season.tov for season in self.seasons),
+         max(season.pf for season in self.seasons),
+         max(season.ppg for season in self.seasons)
+         )
 
 
 # Array of Players - to be shelved
@@ -55,3 +84,9 @@ class PlayerStore:
       else:
          self.players.append(Player(name, season))
          #print("Adding player " + name + " to PlayerStore")
+         
+   # Call at end of parsing to set the max season for every player in
+   # the self.players list
+   def setMaxes(self):
+      for player in self.players:
+         player.setMaxSeason()
