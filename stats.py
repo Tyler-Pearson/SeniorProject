@@ -23,6 +23,12 @@ class Season:
       self.tov = tov
       self.pf = pf
       self.ppg = ppg
+      
+   def to_list(self):
+      return [self.age, self.g, self.mp, self.fga, self.fgp, self.threepa,
+                self.threepp, self.twopa, self.twopp, self.fta, self.ftp,
+                self.orb, self.drb, self.ast, self.stl, self.blk, self.tov,
+                self.pf, self.ppg]
    
 
 # Player name plus array of their seasons (must maintain order)
@@ -64,6 +70,34 @@ class Player:
          max(season.tov for season in self.seasons),
          max(season.pf for season in self.seasons),
          max(season.ppg for season in self.seasons)
+         )
+         
+   # Get season of averages of first n seasons
+   def getAverageOf(self, n):
+      if (n > len(self.seasons)):
+         raise ValueError('Not enough seasons ' + self.name + ' ' +
+            str(len(self.seasons)) + ' - ' + str(n))
+      n_seasons = self.seasons[:n]
+      return Season(
+         sum(season.age for season in n_seasons) / n,
+         sum(season.g for season in n_seasons) / n,
+         sum(season.mp for season in n_seasons) / n,
+         sum(season.fga for season in n_seasons) / n,
+         sum(season.fgp for season in n_seasons) / n,
+         sum(season.threepa for season in n_seasons) / n,
+         sum(season.threepp for season in n_seasons) / n,
+         sum(season.twopa for season in n_seasons) / n,
+         sum(season.twopp for season in n_seasons) / n,
+         sum(season.fta for season in n_seasons) / n,
+         sum(season.ftp for season in n_seasons) / n,
+         sum(season.orb for season in n_seasons) / n,
+         sum(season.drb for season in n_seasons) / n,
+         sum(season.ast for season in n_seasons) / n,
+         sum(season.stl for season in n_seasons) / n,
+         sum(season.blk for season in n_seasons) / n,
+         sum(season.tov for season in n_seasons) / n,
+         sum(season.pf for season in n_seasons) / n,
+         sum(season.ppg for season in n_seasons) / n
          )
 
 
