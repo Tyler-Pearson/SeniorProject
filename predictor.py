@@ -1,26 +1,29 @@
 import shelve
 from stats import *
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense, Activation
 
 
 print("hi")
-print("let's make some predictions!")
+print("let's make some predictions!\n")
 
 
 # Return players list from shelved player_store
-def unpack_player_stats():
+def get_players(seasons_played):
    ps = shelve.open('player_store')
    players = ps['store'].players
    ps.close()
-   return players
+   return [player for player in players if (len(player.seasons) > seasons_played)]
 
 
 # Verify shelving/unshelving occured properly
 # Check ages of players as rookies
 def check_ages(players):
    # print total number of players
-   print(str(len(players)) + " total players")
+   print(str(len(players)) + " total players\n")
 
-   print("Checking ages:")
+   print("Checking ages:\n")
    # initialize array of 40 empty lists (1 for each age)
    ages = [[] for i in range(40)]
    # iterate through all players, add them to their rookie age list
@@ -32,13 +35,27 @@ def check_ages(players):
       if not ages[i]:
          continue # skip if rookie age list is empty
       print(str(i) + " - " + str(len(ages[i]))) # Age - Number of players
-      if (i > 27 and ages[i]):
-         print(ages[i]) # list of tuples [(Name, Seasons played), ...]
+      if (len(ages[i]) >= 5):
+         print(ages[i][:5]) # list of tuples [(Name, Seasons played), ...]
+      else:
+         print(ages[i])
+      print()
+         
+def get_model():
+   model = Sequential()
+   model.add(Dense(19, activation=tf.nn.relu))
+   model.add(Dense(19, activation=tf.nn.relu))
+   model.add(Dense(19))
+   return model
 
 
 # Main
 def main():
-   players = unpack_player_stats() # get players from shelved player_store
+   players = get_players(1) # get players from shelved player_store
+   # model = get_model()
+   # p = players[2401]
+   # s = p.max_season
+   # print(p.name, s.age, s.ftp, s.threepa, s.ppg)
    check_ages(players) # verify player list usability
 
 
