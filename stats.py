@@ -4,25 +4,25 @@ class Season:
 
    def __init__(self, age, g, mp, fga, fgp, threepa, threepp, twopa,
                 twopp, fta, ftp, orb, drb, ast, stl, blk, tov, pf, ppg):
-      self.age = age
-      self.g = g
-      self.mp = mp
-      self.fga = fga
-      self.fgp = fgp
-      self.threepa = threepa
-      self.threepp = threepp
-      self.twopa = twopa
-      self.twopp = twopp
-      self.fta = fta
-      self.ftp = ftp
-      self.orb = orb
-      self.drb = drb
-      self.ast = ast
-      self.stl = stl
-      self.blk = blk
-      self.tov = tov
-      self.pf = pf
-      self.ppg = ppg
+      self.age = round(age/50.0, 3)
+      self.g = round(g/82.0, 3)
+      self.mp = round(mp/48.0, 3)
+      self.fga = round(fga/50.0, 3)
+      self.fgp = round(fgp, 3)
+      self.threepa = round(threepa/50.0, 3)
+      self.threepp = round(threepp, 3)
+      self.twopa = round(twopa/50.0, 3)
+      self.twopp = round(twopp, 3)
+      self.fta = round(fta/50.0, 3)
+      self.ftp = round(ftp, 3)
+      self.orb = round(orb/50.0, 3)
+      self.drb = round(drb/50.0, 3)
+      self.ast = round(ast/50.0, 3)
+      self.stl = round(stl/50.0, 3)
+      self.blk = round(blk/50.0, 3)
+      self.tov = round(tov/50.0, 3)
+      self.pf = round(pf/6.0, 3)
+      self.ppg = round(ppg/50.0, 3)
       
    def to_list(self):
       return [self.age, self.g, self.mp, self.fga, self.fgp, self.threepa,
@@ -79,25 +79,25 @@ class Player:
             str(len(self.seasons)) + ' - ' + str(n))
       n_seasons = self.seasons[:n]
       return Season(
-         sum(season.age for season in n_seasons) / n,
-         sum(season.g for season in n_seasons) / n,
-         sum(season.mp for season in n_seasons) / n,
-         sum(season.fga for season in n_seasons) / n,
-         sum(season.fgp for season in n_seasons) / n,
-         sum(season.threepa for season in n_seasons) / n,
-         sum(season.threepp for season in n_seasons) / n,
-         sum(season.twopa for season in n_seasons) / n,
-         sum(season.twopp for season in n_seasons) / n,
-         sum(season.fta for season in n_seasons) / n,
-         sum(season.ftp for season in n_seasons) / n,
-         sum(season.orb for season in n_seasons) / n,
-         sum(season.drb for season in n_seasons) / n,
-         sum(season.ast for season in n_seasons) / n,
-         sum(season.stl for season in n_seasons) / n,
-         sum(season.blk for season in n_seasons) / n,
-         sum(season.tov for season in n_seasons) / n,
-         sum(season.pf for season in n_seasons) / n,
-         sum(season.ppg for season in n_seasons) / n
+         sum([season.age*50.0 for season in n_seasons]) / n,
+         sum([season.g*82.0 for season in n_seasons]) / n,
+         sum([season.mp*48.0 for season in n_seasons]) / n,
+         sum([season.fga*50.0 for season in n_seasons]) / n,
+         sum([season.fgp for season in n_seasons]) / n,
+         sum([season.threepa*50.0 for season in n_seasons]) / n,
+         sum([season.threepp for season in n_seasons]) / n,
+         sum([season.twopa*50.0 for season in n_seasons]) / n,
+         sum([season.twopp for season in n_seasons]) / n,
+         sum([season.fta*50.0 for season in n_seasons]) / n,
+         sum([season.ftp for season in n_seasons]) / n,
+         sum([season.orb*50.0 for season in n_seasons]) / n,
+         sum([season.drb*50.0 for season in n_seasons]) / n,
+         sum([season.ast*50.0 for season in n_seasons]) / n,
+         sum([season.stl*50.0 for season in n_seasons]) / n,
+         sum([season.blk*50.0 for season in n_seasons]) / n,
+         sum([season.tov*50.0 for season in n_seasons]) / n,
+         sum([season.pf*6.0 for season in n_seasons]) / n,
+         sum([season.ppg*50.0 for season in n_seasons]) / n
          )
 
 

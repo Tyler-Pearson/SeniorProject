@@ -4,6 +4,8 @@ import random
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from numpy import array
+from numpy import random
 
 
 
@@ -20,6 +22,8 @@ PROJ_SEASON = 1
 # Ratio of train data to test data
 # ie 0.8 => 80% train, 20% test
 TRAIN_RATIO = 0.8
+# size of batches
+BATCH_SIZE = 32
 
 
 print("\nhi")
@@ -46,6 +50,7 @@ def get_player_sets():
    test_set = players[split_ind:]
    
    # logging
+   # print("LOG:")
    # print(train_set[0].name, train_set[0].seasons[0].to_list())
    # print(test_set[0].name, test_set[0].seasons[0].to_list())
    
@@ -59,7 +64,10 @@ def get_player_sets():
       y_train = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), train_set))
       y_test = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), test_set))
 
-   return (x_train, y_train, x_test, y_test)
+   return (array([array(el) for el in x_train]), 
+            array([array(el) for el in y_train]),
+            array([array(el) for el in x_test]),
+            array([array(el) for el in y_test]))
 
 
 # Verify shelving/unshelving occured properly
@@ -88,13 +96,15 @@ def check_ages(players):
          
          
 # Set up Neural Network model
-def get_model():
+def get_model(in_size, out_size):
+   h_layer_size = int((in_size + out_size) / 2)
+   print("generating model", in_size, h_layer_size, out_size)
    model = Sequential()
-   model.add(Dense(19, use_bias=True, activation=tf.nn.relu))
-   model.add(Dense(19, use_bias=True, activation=tf.nn.relu))
+   model.add(Dense(32, input_dim=in_size, use_bias=True, activation=tf.nn.relu))
+   model.add(Dense(h_layer_size, use_bias=True, activation=tf.nn.relu))
    model.add(Dense(19))
    model.compile(optimizer = 'adam',
-      loss = 'sparse_categorical_crossentropy',
+      loss = 'categorical_crossentropy',
       metrics=['accuracy'])
    return model
 
@@ -105,7 +115,13 @@ def get_model():
 def main():
    # get players from shelved player_store
    (x_train, y_train, x_test, y_test) = get_player_sets()
-   model = get_model()
+   model = get_model(len(x_train[0]), len(y_train[0]))
+   model.summary()
+   model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=32)
+   predictions = model.predict(x_test)
+   print(x_test[0])
+   print(predictions[0])
+   print(y_test[0])
    # p = players[2401]
    # s = p.max_season
    # print(p.name, s.age, s.ftp, s.threepa, s.ppg)

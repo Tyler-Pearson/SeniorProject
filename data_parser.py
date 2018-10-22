@@ -6,7 +6,7 @@ from stats import *
 
 
 # Defines
-XL_PATH = '.\\Stats\\'
+XL_PATH = './Stats/'
 XL_EXT = '.xlsx'
 YEAR_START = 1979
 YEAR_END = 2017
