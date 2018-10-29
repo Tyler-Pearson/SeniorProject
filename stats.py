@@ -23,6 +23,23 @@ class Season:
       self.tov = round(tov/50.0, 3)
       self.pf = round(pf/6.0, 3)
       self.ppg = round(ppg/50.0, 3)
+
+   def denorm(self):
+      self.age = age*50.0
+      self.g = g*82.0
+      self.mp = mp*48.0
+      self.fga = fga*50.0
+      self.threepa = threepa*50.0
+      self.twopa = twopa*50.0
+      self.fta = fta*50.0
+      self.orb = orb*50.0
+      self.drb = drb*50.0
+      self.ast = ast*50.0
+      self.stl = stl*50.0
+      self.blk = blk*50.0
+      self.tov = tov*50.0
+      self.pf = pf*6.0
+      self.ppg = ppg*50.0
       
    def to_list(self):
       return [self.age, self.g, self.mp, self.fga, self.fgp, self.threepa,

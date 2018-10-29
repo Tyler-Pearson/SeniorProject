@@ -2,8 +2,8 @@ import shelve
 from stats import *
 import random
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.models import Model, Sequential
+from keras.layers import Input, Dense, Activation
 from numpy import array
 from numpy import random
 
@@ -99,12 +99,16 @@ def check_ages(players):
 def get_model(in_size, out_size):
    h_layer_size = int((in_size + out_size) / 2)
    print("generating model", in_size, h_layer_size, out_size)
-   model = Sequential()
-   model.add(Dense(32, input_dim=in_size, use_bias=True, activation=tf.nn.relu))
-   model.add(Dense(h_layer_size, use_bias=True, activation=tf.nn.relu))
-   model.add(Dense(19))
-   model.compile(optimizer = 'adam',
-      loss = 'categorical_crossentropy',
+   inputs = Input(shape=(in_size,))
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid, use_bias=True)(inputs)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   outputs = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   model = Model(inputs=inputs, outputs=outputs)
+   model.compile(optimizer = 'rmsprop',
+      loss = 'mse',
       metrics=['accuracy'])
    return model
 
