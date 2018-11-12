@@ -26,8 +26,8 @@ TRAIN_RATIO = 0.8
 BATCH_SIZE = 32
 
 
-print("\nhi")
-print("let's make some predictions!\n")
+# print("\nhi")
+# print("let's make some predictions!\n")
 
 
 # Return players list from shelved player_store
@@ -113,7 +113,7 @@ def get_model(in_size, out_size):
 #
 # Main
 #
-def main():
+def get_predictor():
    # get players from shelved player_store
    (x_train, y_train, x_test, y_test) = get_player_sets()
    model = get_model(len(x_train[0]), len(y_train[0]))
@@ -129,6 +129,7 @@ def main():
    print(list(x_test[1]))
    print([round(x, 3) for x in predictions[1]])
    print(list(y_test[1]))
+   return model
    # p = players[2401]
    # s = p.max_season
    # print(p.name, s.age, s.ftp, s.threepa, s.ppg)
@@ -136,6 +137,6 @@ def main():
    # print(x_test[0], y_test[0])
 
 
-if __name__ == "__main__":
-   main()
+# if __name__ == "__main__":
+   # main()
 
