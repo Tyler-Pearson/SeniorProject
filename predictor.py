@@ -36,7 +36,7 @@ def get_player_sets():
    ps = shelve.open('player_store')
    players = ps['store'].players
    ps.close()
-   
+
    # filter players by seasons played
    if (PROJ_SEASON > 0):
       players = [player for player in players if (len(player.seasons) > PROJ_SEASON)]
@@ -48,15 +48,15 @@ def get_player_sets():
    split_ind = int(len(players) * TRAIN_RATIO)
    train_set = players[:split_ind]
    test_set = players[split_ind:]
-   
+
    # logging
    # print("LOG:")
    # print(train_set[0].name, train_set[0].seasons[0].to_list())
    # print(test_set[0].name, test_set[0].seasons[0].to_list())
-   
+
    # get testing and training input and output sets
-   x_train = list(map(lambda x: x.getAverageOf(PREP_SEASON+1).to_list(), train_set))
-   x_test = list(map(lambda x: x.getAverageOf(PREP_SEASON+1).to_list(), test_set))
+   x_train = list(map(lambda x: x.seasons[PREP_SEASON].to_list(), train_set))
+   x_test = list(map(lambda x: x.seasons[PREP_SEASON].to_list(), test_set))
    if (PROJ_SEASON == 0):
       y_train = list(map(lambda x: x.max_season.to_list(), train_set))
       y_test = list(map(lambda x: x.max_season.to_list(), test_set))
@@ -64,7 +64,7 @@ def get_player_sets():
       y_train = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), train_set))
       y_test = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), test_set))
 
-   return (array([array(el) for el in x_train]), 
+   return (array([array(el) for el in x_train]),
             array([array(el) for el in y_train]),
             array([array(el) for el in x_test]),
             array([array(el) for el in y_test]))
@@ -93,8 +93,8 @@ def check_ages(players):
       else:
          print(ages[i])
       print()
-         
-         
+
+
 # Set up Neural Network model
 def get_model(in_size, out_size):
    h_layer_size = int((in_size + out_size) / 2)
@@ -110,10 +110,22 @@ def get_model(in_size, out_size):
    return model
 
 
+def get_prep_season():
+   global PREP_SEASON
+   return PREP_SEASON
+
+def get_proj_season():
+   global PROJ_SEASON
+   return PROJ_SEASON
+
+
 #
 # Main
 #
-def get_predictor():
+def get_predictor(prep = 0, proj = 1):
+   global PREP_SEASON, PROJ_SEASON
+   PREP_SEASON = prep
+   PROJ_SEASON = proj
    # get players from shelved player_store
    (x_train, y_train, x_test, y_test) = get_player_sets()
    model = get_model(len(x_train[0]), len(y_train[0]))
@@ -139,4 +151,3 @@ def get_predictor():
 
 # if __name__ == "__main__":
    # main()
-

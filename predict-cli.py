@@ -6,8 +6,25 @@ PLAYERS = shelve.open('player_store')['store'].players
 
 
 
+def new_model():
+   print("Note: 0 = rookie season, project = 0 for best season")
+   prep = input("Number of prep seasons: ")
+   proj = input("Projecting season: ")
+   print("Getting new model")
+   return get_predictor(prep = prep, proj = proj)
+
 def get_possible_players(name):
-   return sorted(filter(lambda x: name in x.name.lower(), PLAYERS), key=lambda x: len(x.seasons), reverse=True)
+   return sorted(filter(lambda x: len(x.seasons) > get_prep_season(), filter(lambda x: name in x.name.lower(), PLAYERS)), key=lambda x: len(x.seasons), reverse=True)
+
+
+def print_prediction(model, player):
+   print(player.name)
+   print("        age    g      mp     fga    fgp    3pa    3pp    2pa    2pp    fta    ftp    orb    drb    ast    stl    blk    tov    pf     ppg")
+   print("prev:   {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(player.seasons[get_prep_season()].to_list()))
+   prediction = model.predict(array([array(player.seasons[PREP_SEASON].to_list())]))[0]
+   print("proj:   {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(prediction))
+   if (len(player.seasons) > PROJ_SEASON):
+      print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(player.seasons[get_proj_season()].to_list()))
 
 
 def predict(model):
@@ -16,7 +33,7 @@ def predict(model):
    if (len(possible_players) == 0):
       print("Player unavailable")
    elif (len(possible_players) == 1):
-      print("You're looking for " + possible_players[0].name)
+      print_prediction(model, possible_players[0])
    else:
       print("Did you mean:")
       i = 0
@@ -25,8 +42,8 @@ def predict(model):
          i += 1
       print("   [" + str(i) + "] - None of these")
       player_ind = int(input("Which do you want?: "))
-      if (player_ind < len(possible_players)):
-         print("You're looking for " + possible_players[player_ind].name)
+      if (player_ind >= 0 and player_ind < len(possible_players)):
+         print_prediction(model, possible_players[player_ind])
       else:
          print("Sorry!")
 
@@ -41,15 +58,15 @@ def get_option():
 
 def main():
    print("\nlet's predict!\nInitializing model\n")
-   model = get_predictor()
+   model = new_model()
    option = 'a'
    while (option != 'x'):
       option = get_option()
       if (option != 'm' and option != 'p' and option != 'x'):
          print("Invalid option")
       elif (option == 'm'):
-         print("Replacing model\n")
-         model = get_predictor()
+         model = new_model()
+         print("Model replaced!")
       elif (option == 'p'):
          print("Getting prediction")
          predict(model)
@@ -59,4 +76,3 @@ def main():
 
 if __name__ == "__main__":
    main()
-

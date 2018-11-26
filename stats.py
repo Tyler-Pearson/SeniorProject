@@ -1,4 +1,22 @@
 
+def denorm(l):
+   l[0] *= 50.0
+   l[1] *= 82.0
+   l[2] *= 48.0
+   l[3] *= 50.0
+   l[5] *= 50.0
+   l[7] *= 50.0
+   l[9] *= 50.0
+   l[11] *= 50.0
+   l[12] *= 50.0
+   l[13] *= 50.0
+   l[14] *= 50.0
+   l[15] *= 50.0
+   l[16] *= 50.0
+   l[17] *= 6.0
+   l[18] *= 50.0
+   return [round(x, 3) for x in l]
+
 # All fields in .xlsx files except Player name string
 class Season:
 
@@ -40,13 +58,21 @@ class Season:
       self.tov = tov*50.0
       self.pf = pf*6.0
       self.ppg = ppg*50.0
-      
+
+   def to_denorm_list(self):
+      l = [self.age*50.0, self.g*82.0, self.mp*48.0, self.fga*50.0, self.fgp,
+                self.threepa*50.0, self.threepp, self.twopa*50.0, self.twopp,
+                self.fta*50.0, self.ftp, self.orb*50.0, self.drb*50.0,
+                self.ast*50.0, self.stl*50.0, self.blk*50.0, self.tov*50.0,
+                self.pf*6.0, self.ppg*50.0]
+      return [round(el, 3) for el in l]
+
    def to_list(self):
       return [self.age, self.g, self.mp, self.fga, self.fgp, self.threepa,
                 self.threepp, self.twopa, self.twopp, self.fta, self.ftp,
                 self.orb, self.drb, self.ast, self.stl, self.blk, self.tov,
                 self.pf, self.ppg]
-   
+
 
 # Player name plus array of their seasons (must maintain order)
 class Player:
@@ -63,7 +89,7 @@ class Player:
    # a new Player object while adding a season to PlayerStore
    def __eq__(self, other):
       return (self.name == other)
-      
+
    # Set self.max_season to a Season object of the best stat in
    # each statistical category of the player's seasons
    def setMaxSeason(self):
@@ -88,7 +114,7 @@ class Player:
          max(season.pf for season in self.seasons),
          max(season.ppg for season in self.seasons)
          )
-         
+
    # Get season of averages of first n seasons
    def getAverageOf(self, n):
       if (n > len(self.seasons)):
@@ -135,7 +161,7 @@ class PlayerStore:
       else:
          self.players.append(Player(name, season))
          #print("Adding player " + name + " to PlayerStore")
-         
+
    # Call at end of parsing to set the max season for every player in
    # the self.players list
    def setMaxes(self):
