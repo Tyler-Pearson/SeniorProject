@@ -41,7 +41,7 @@ def get_player_sets():
    if (PROJ_SEASON > 0):
       players = [player for player in players if (len(player.seasons) > PROJ_SEASON)]
    else:
-      players = [player for player in players if (len(player.seasons) >= PREP_SEASON)]
+      players = [player for player in players if (len(player.seasons) > PREP_SEASON)]
 
    # split into training and testing sets
    random.shuffle(players)
@@ -101,7 +101,11 @@ def get_model(in_size, out_size):
    print("generating model", in_size, h_layer_size, out_size)
    inputs = Input(shape=(in_size,))
    x = Dense(h_layer_size*25, activation=tf.nn.sigmoid)(inputs)
-   outputs = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
    outputs = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
    model = Model(inputs=inputs, outputs=outputs)
    model.compile(optimizer = 'rmsprop',
@@ -130,7 +134,7 @@ def get_predictor(prep = 0, proj = 1):
    (x_train, y_train, x_test, y_test) = get_player_sets()
    model = get_model(len(x_train[0]), len(y_train[0]))
    model.summary()
-   model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=16)
+   model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=100, batch_size=16)
    predictions = model.predict(x_test)
    print("[age, g, mpg, fga, fgp, 3pa, 3pp, 2pa, 2pp, fta, ftp, orb, drb, ast, stk, blk, tov, pf, ppg]")
    print(1)
