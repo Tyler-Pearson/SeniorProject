@@ -69,7 +69,8 @@ def get_player_sets():
    return (array([array(el) for el in x_train]),
             array([array(el) for el in y_train]),
             array([array(el) for el in x_test]),
-            array([array(el) for el in y_test]))
+            array([array(el) for el in y_test]),
+            [p.name for p in train_set])
 
 
 # Verify shelving/unshelving occured properly
@@ -142,7 +143,7 @@ def get_predictor(prep = 0, proj = 1):
    PREP_SEASON = prep
    PROJ_SEASON = proj
    # get players from shelved player_store
-   (x_train, y_train, x_test, y_test) = get_player_sets()
+   (x_train, y_train, x_test, y_test, names_train) = get_player_sets()
    model = get_model(len(x_train[0]), len(y_train[0]))
    model.summary()
    history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=0)
@@ -157,7 +158,7 @@ def get_predictor(prep = 0, proj = 1):
    #print(list(x_test[1]))
    #print([round(x, 3) for x in predictions[1]])
    #print(list(y_test[1]))
-   return model
+   return (model, names_train)
    # p = players[2401]
    # s = p.max_season
    # print(p.name, s.age, s.ftp, s.threepa, s.ppg)
