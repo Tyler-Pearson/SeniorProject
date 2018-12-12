@@ -21,13 +21,26 @@ def print_prediction(model, player):
    print(player.name)
    print("        age    g      mp     fga    fgp    3pa    3pp    2pa    2pp    fta    ftp    orb    drb    ast    stl    blk    tov    pf     ppg")
    print("prev:   {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(player.seasons[get_prep_season()].to_list()))
-   prediction = model.predict(array([array(player.seasons[PREP_SEASON].to_list())]))[0]
+   prep = player.seasons[PREP_SEASON].to_list()
+   prediction = model.predict(array([array(prep)]))[0]
    print("proj:   {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(prediction))
    if (len(player.seasons) > PROJ_SEASON):
       if (get_proj_season() == 0):
-         print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(player.max_season.to_list()))
+         actual = player.max_season.to_list()
+         print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(actual))
+         print("Prediction Accuracy")
+         print("prediction mse:    " + str(round(mse_calc(norm(prediction), norm(actual)), 4)))
+         print("no change mse:     " + str(round(mse_calc(prep, norm(actual)), 4)))
+         print("random mse:        " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
+         print("pseudo random mse: " + str(round(mse_calc([p + random.uniform(-0.05, 0.05) for p in player.seasons[PREP_SEASON].to_list()], norm(actual)), 4)))
       else:
-         print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(player.seasons[get_proj_season()].to_list()))
+         actual = player.seasons[get_proj_season()].to_list()
+         print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(actual))
+         print("Prediction Accuracy")
+         print("prediction mse:    " + str(round(mse_calc(norm(prediction), norm(actual)), 4)))
+         print("no change mse:     " + str(round(mse_calc(prep, norm(actual)), 4)))
+         print("random mse:        " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
+         print("pseudo random mse: " + str(round(mse_calc([p + random.uniform(-0.1, 0.1) for p in player.seasons[PREP_SEASON].to_list()], norm(actual)), 4)))
 
 
 def predict(model):

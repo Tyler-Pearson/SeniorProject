@@ -1,4 +1,31 @@
 
+def mse_calc(proj, actual):
+   ms = 0
+   for i in range(len(proj)):
+      ms += (actual[i] - proj[i]) ** 2
+   return ms / len(proj)
+
+def mse_all(projs, actuals):
+   return round(sum([mse_calc(projs[i], actuals[i]) for i in range(len(projs))]) / len(projs), 4)
+
+def norm(l):
+   l[0] /= 50.0
+   l[1] /= 82.0
+   l[2] /= 48.0
+   l[3] /= 50.0
+   l[5] /= 50.0
+   l[7] /= 50.0
+   l[9] /= 50.0
+   l[11] /= 50.0
+   l[12] /= 50.0
+   l[13] /= 50.0
+   l[14] /= 50.0
+   l[15] /= 50.0
+   l[16] /= 50.0
+   l[17] /= 6.0
+   l[18] /= 50.0
+   return [round(x, 3) for x in l]
+
 def denorm(l):
    l[0] *= 50.0
    l[1] *= 82.0
