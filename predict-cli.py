@@ -1,5 +1,6 @@
 from predictor import *
 from keras.models import load_model
+import os.path
 
 
 
@@ -29,19 +30,23 @@ def print_prediction(model, player, other):
       if (get_proj_season() == 0):
          actual = player.max_season.to_list()
          print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(actual))
-         print("Prediction Accuracy")
-         print("prediction mse:    " + str(round(mse_calc(norm(prediction), norm(actual)), 4)))
-         print("no change mse:     " + str(round(mse_calc(prep, norm(actual)), 4)))
-         print("pseudo random mse: " + str(round(mse_calc([p + random.uniform(-0.05, 0.05) for p in player.seasons[PREP_SEASON].to_list()], norm(actual)), 4)))
-         print("random mse:        " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
+         print("-------------------------")
+         print("Prediction Accuracy (MSE)")
+         print("-------------------------")
+         print("model prediction: " + str(round(mse_calc(norm(prediction), norm(actual)), 4)))
+         print("no change:        " + str(round(mse_calc(prep, norm(actual)), 4)))
+         print("pseudo random:    " + str(round(mse_calc([p + random.uniform(-0.05, 0.05) for p in player.seasons[PREP_SEASON].to_list()], norm(actual)), 4)))
+         print("random:           " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
       else:
          actual = player.seasons[get_proj_season()].to_list()
          print("actual: {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(actual))
-         print("Prediction Accuracy")
-         print("prediction mse:    " + str(round(mse_calc(norm(prediction), norm(actual)), 4)))
-         print("no change mse:     " + str(round(mse_calc(prep, norm(actual)), 4)))
-         print("pseudo random mse: " + str(round(mse_calc([p + random.uniform(-0.1, 0.1) for p in player.seasons[PREP_SEASON].to_list()], norm(actual)), 4)))
-         print("random mse:        " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
+         print("-------------------------")
+         print("Prediction Accuracy (MSE)")
+         print("-------------------------")
+         print("model prediction: " + str(round(mse_calc(norm(prediction), norm(actual)), 4)))
+         print("no change:        " + str(round(mse_calc(prep, norm(actual)), 4)))
+         print("pseudo random:    " + str(round(mse_calc([p + random.uniform(-0.1, 0.1) for p in player.seasons[PREP_SEASON].to_list()], norm(actual)), 4)))
+         print("random:           " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
 
 
 def predict(model, names_train):
@@ -76,12 +81,18 @@ def get_option():
 
 def main():
    print("\nlet's predict!\nInitializing model\n")
-   model = load_model("saved_model.h5")
-   ps = shelve.open('saved_names')
-   names_train = ps['names']
-   print(names_train[0])
-   ps.close()
+   if (os.path.isfile("saved_model.h5") and os.path.isfile("saved_names")):
+      print("Retrieving existing model")
+      model = load_model("saved_model.h5")
+      ps = shelve.open('saved_names')
+      names_train = ps['names']
+      ps.close()
+   else:
+      (m, n) = new_model()
+      model = m
+      names_train = n
    option = 'a'
+
    while (option != 'x'):
       option = get_option()
       if (option != 'n' and option != 'p' and option != 'x' and option != 's'):
