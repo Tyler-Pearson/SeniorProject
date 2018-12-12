@@ -1,4 +1,5 @@
 from predictor import *
+from keras.models import load_model
 
 
 
@@ -66,26 +67,39 @@ def predict(model, names_train):
 
 def get_option():
    print("\nOptions:")
-   print("   (m) Get new model")
+   print("   (n) Get new model")
    print("   (p) Get player prediction")
    print("   (x) Exit")
+   print("   (s) Save model")
    return raw_input("What do you want to do?: ").lower() # Must change to input for conversion to python3
 
 
 def main():
    print("\nlet's predict!\nInitializing model\n")
-   (model, names_train) = new_model()
+   model = load_model("saved_model.h5")
+   ps = shelve.open('saved_names')
+   names_train = ps['names']
+   print(names_train[0])
+   ps.close()
    option = 'a'
    while (option != 'x'):
       option = get_option()
-      if (option != 'm' and option != 'p' and option != 'x'):
+      if (option != 'n' and option != 'p' and option != 'x' and option != 's'):
          print("Invalid option")
-      elif (option == 'm'):
-         model = new_model()
+      elif (option == 'n'):
+         (m, n) = new_model()
+         model = m
+         names_train = n
          print("Model replaced!")
       elif (option == 'p'):
          print("Getting prediction")
          predict(model, names_train)
+      elif (option == 's'):
+         ps = shelve.open('saved_names')
+         ps['names'] = names_train
+         ps.close()
+         model.save("saved_model.h5")
+         print("Model Saved")
       else:
          print("Thanks!\n")
 

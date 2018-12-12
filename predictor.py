@@ -23,7 +23,7 @@ PROJ_SEASON = 1
 # ie 0.8 => 80% train, 20% test
 TRAIN_RATIO = 0.8
 # epochs
-EPOCHS = 200
+EPOCHS = 300
 # size of batches
 BATCH_SIZE = 16
 
@@ -103,9 +103,11 @@ def get_model(in_size, out_size):
    h_layer_size = int((in_size + out_size) / 2)
    print("generating model", in_size, h_layer_size, out_size)
    inputs = Input(shape=(in_size,))
-   x = Dense(h_layer_size*25, activation='linear')(inputs)
-   x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
-   x = Dense(out_size, activation='linear', use_bias=True)(x)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid)(inputs)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid)(x)
+   x = Dense(h_layer_size, activation=tf.nn.sigmoid)(x)
+   #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
+   #x = Dense(out_size, activation='linear', use_bias=True)(x)
    #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
    #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
    #x = Dense(out_size, activation=tf.nn.sigmoid, use_bias=True)(x)
@@ -146,6 +148,7 @@ def get_predictor(prep = 0, proj = 1):
    (x_train, y_train, x_test, y_test, names_train) = get_player_sets()
    model = get_model(len(x_train[0]), len(y_train[0]))
    model.summary()
+   print("\nGetting new model...\n")
    history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=0)
    compare_acc(x_test, y_test, model)
    #predictions = model.predict(x_test)
