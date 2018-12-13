@@ -127,14 +127,25 @@ def get_proj_season():
    global PROJ_SEASON
    return PROJ_SEASON
 
+def get_averages(p_set):
+   averages = []
+   for i in range(len(p_set[0])):
+      sum = 0
+      for j in range(len(p_set)):
+         sum += p_set[j][i]
+      averages.append(sum / len(p_set))
+   return averages
 
 def compare_acc(x, y, model):
    print("Comparison metrics")
+   print("------------------")
    predictions = model.predict(x)
-   print("Validation MSE Acc:  " + str(mse_all(predictions, y)))
-   print("No Change MSE Acc:   " + str(mse_all(x, y)))
-   print("Pseudo Rand MSE Acc: " + str(mse_all([p + random.uniform(-0.05, 0.05) for p in x], y)))
-   print("Full Rand MSE Acc:   " + str(mse_all([random.uniform(0.0, 1.0, size=len(y[0])) for i in range(len(y))], y)))
+   print("Validation MSE Acc:   " + str(mse_all(predictions, y)))
+   print("No Change MSE Acc:    " + str(mse_all(x, y)))
+   averages = get_averages(x)
+   print("Regr to mean MSE Acc: " + str(mse_all([[(averages[i] + p[i]) / 2 for i in range(len(x[0]))] for p in x], y)))
+   print("Pseudo Rand MSE Acc:  " + str(mse_all([p + random.uniform(0.0, 0.1) for p in x], y)))
+   print("Full Rand MSE Acc:    " + str(mse_all([random.uniform(0.0, 1.0, size=len(y[0])) for i in range(len(y))], y)))
 
 
 #
@@ -148,7 +159,17 @@ def get_predictor(prep = 0, proj = 1):
    (x_train, y_train, x_test, y_test, names_train) = get_player_sets()
    model = get_model(len(x_train[0]), len(y_train[0]))
    model.summary()
-   print("\nGetting new model...\n")
+   print("\n\nGetting new model...")
+   print("Epochs: " + str(EPOCHS) + ", Batch Size: " + str(BATCH_SIZE) + "\n")
+   print("Metrics Glossary")
+   print("----------------")
+   print("MSE:          mean squared error = average of normalized error")
+   print("Validation:   mse accuracy of model predicting on validation set")
+   print("No Change:    prediction is player's stats will not change")
+   print("Regr to mean: prediction is player's stats will be halfway between their previous season")
+   print("                 and the league historic average for players in their correlated season")
+   print("Pseudo Rand:  prediction is player's prep season + 0% to 10% improvement")
+   print("Full Rand:    prediction is random float between 0.0 and 1.0 denormalized\n")
    history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=0)
    compare_acc(x_test, y_test, model)
    #predictions = model.predict(x_test)

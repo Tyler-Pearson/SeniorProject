@@ -74,8 +74,8 @@ def get_option():
    print("\nOptions:")
    print("   (n) Get new model")
    print("   (p) Get player prediction")
-   print("   (x) Exit")
    print("   (s) Save model")
+   print("   (x) Exit")
    return raw_input("What do you want to do?: ").lower() # Must change to input for conversion to python3
 
 
