@@ -19,8 +19,8 @@ def get_possible_players(name):
    return sorted(filter(lambda x: len(x.seasons) > get_prep_season(), filter(lambda x: name in x.name.lower(), PLAYERS)), key=lambda x: len(x.seasons), reverse=True)
 
 
-def print_prediction(model, player, other):
-   print(player.name + " " + other)
+def print_prediction(model, player):
+   print(player.name)
    print("        age    g      mp     fga    fgp    3pa    3pp    2pa    2pp    fta    ftp    orb    drb    ast    stl    blk    tov    pf     ppg")
    print("prev:   {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f} {:6.3f}").format(*denorm(player.seasons[get_prep_season()].to_list()))
    prep = player.seasons[PREP_SEASON].to_list()
@@ -49,13 +49,13 @@ def print_prediction(model, player, other):
          print("random:           " + str(round(mse_calc(random.uniform(low=0.0, high=1.0, size=(19,)), norm(actual)), 4)))
 
 
-def predict(model, names_train):
+def predict(model):
    name = raw_input("Player name: ").lower() # must change to input for conversion to python3
    possible_players = get_possible_players(name)
    if (len(possible_players) == 0):
       print("Player unavailable")
    elif (len(possible_players) == 1):
-      print_prediction(model, possible_players[0], (" from train set" if possible_players[0].name in names_train else " from test set"))
+      print_prediction(model, possible_players[0])
    else:
       print("Did you mean:")
       i = 0
@@ -65,7 +65,7 @@ def predict(model, names_train):
       print("   [" + str(i) + "] - None of these")
       player_ind = int(input("Which do you want?: "))
       if (player_ind >= 0 and player_ind < len(possible_players)):
-         print_prediction(model, possible_players[player_ind], (" from train set" if possible_players[player_ind].name in names_train else " from test set"))
+         print_prediction(model)
       else:
          print("Sorry!")
 
@@ -81,16 +81,15 @@ def get_option():
 
 def main():
    print("\nlet's predict!\nInitializing model\n")
-   if (os.path.isfile("saved_model.h5") and os.path.isfile("saved_names")):
+   if (os.path.isfile("saved_model.h5")):
       print("Retrieving existing model")
       model = load_model("saved_model.h5")
-      ps = shelve.open('saved_names')
-      names_train = ps['names']
-      ps.close()
+      #ps = shelve.open('saved_names')
+      #names_train = ps['names']
+      #ps.close()
    else:
-      (m, n) = new_model()
-      model = m
-      names_train = n
+      model = new_model()
+      #names_train = n
    option = 'a'
 
    while (option != 'x'):
@@ -100,15 +99,14 @@ def main():
       elif (option == 'n'):
          (m, n) = new_model()
          model = m
-         names_train = n
          print("Model replaced!")
       elif (option == 'p'):
          print("Getting prediction")
-         predict(model, names_train)
+         predict(model)
       elif (option == 's'):
-         ps = shelve.open('saved_names')
-         ps['names'] = names_train
-         ps.close()
+         #ps = shelve.open('saved_names')
+         #ps['names'] = names_train
+         #ps.close()
          model.save("saved_model.h5")
          print("Model Saved")
       else:

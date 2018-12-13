@@ -2,6 +2,7 @@ import shelve
 from stats import *
 import random
 import tensorflow as tf
+from sklearn.model_selection import StratifiedKFold
 from keras.models import Model, Sequential
 from keras.layers import Input, Dense, Activation
 from numpy import array
@@ -23,9 +24,11 @@ PROJ_SEASON = 1
 # ie 0.8 => 80% train, 20% test
 TRAIN_RATIO = 0.8
 # epochs
-EPOCHS = 300
+EPOCHS = 50
 # size of batches
 BATCH_SIZE = 16
+# folds
+FOLDS = 10
 
 
 # print("\nhi")
@@ -46,31 +49,22 @@ def get_player_sets():
       players = [player for player in players if (len(player.seasons) > PREP_SEASON)]
 
    # split into training and testing sets
-   random.shuffle(players)
-   split_ind = int(len(players) * TRAIN_RATIO)
-   train_set = players[:split_ind]
-   test_set = players[split_ind:]
-
-   # logging
-   # print("LOG:")
-   # print(train_set[0].name, train_set[0].seasons[0].to_list())
-   # print(test_set[0].name, test_set[0].seasons[0].to_list())
+   #random.shuffle(players)
+   #split_ind = int(len(players) * TRAIN_RATIO)
+   #train_set = players[:split_ind]
+   #test_set = players[split_ind:]
 
    # get testing and training input and output sets
-   x_train = list(map(lambda x: x.seasons[PREP_SEASON].to_list(), train_set))
-   x_test = list(map(lambda x: x.seasons[PREP_SEASON].to_list(), test_set))
+   X = list(map(lambda x: x.seasons[PREP_SEASON].to_list(), players))
+   #x_test = list(map(lambda x: x.seasons[PREP_SEASON].to_list(), test_set))
    if (PROJ_SEASON == 0):
-      y_train = list(map(lambda x: x.max_season.to_list(), train_set))
-      y_test = list(map(lambda x: x.max_season.to_list(), test_set))
+      Y = list(map(lambda x: x.max_season.to_list(), players))
+      #y_test = list(map(lambda x: x.max_season.to_list(), test_set))
    else:
-      y_train = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), train_set))
-      y_test = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), test_set))
+      Y = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), players))
+      #y_test = list(map(lambda x: x.seasons[PROJ_SEASON].to_list(), test_set))
 
-   return (array([array(el) for el in x_train]),
-            array([array(el) for el in y_train]),
-            array([array(el) for el in x_test]),
-            array([array(el) for el in y_test]),
-            [p.name for p in train_set])
+   return (array(X), array(Y))
 
 
 # Verify shelving/unshelving occured properly
@@ -118,7 +112,9 @@ def get_model(in_size, out_size):
       loss = 'mse')
    return model
 
-
+#
+# Helpers and API
+#
 def get_prep_season():
    global PREP_SEASON
    return PREP_SEASON
@@ -126,6 +122,18 @@ def get_prep_season():
 def get_proj_season():
    global PROJ_SEASON
    return PROJ_SEASON
+
+def print_glossary():
+   print("----------------")
+   print("Metrics Glossary")
+   print("----------------")
+   print("MSE:          mean squared error = average of normalized error")
+   print("Validation:   mse accuracy of model predicting on validation set")
+   print("No Change:    prediction is player's stats will not change")
+   print("Regr to mean: prediction is player's stats will be halfway between their previous season")
+   print("                 and the league historic average for players in their correlated season")
+   print("Pseudo Rand:  prediction is player's prep season + 0% to 10% improvement")
+   print("Full Rand:    prediction is random float between 0.0 and 1.0 denormalized\n")
 
 def get_averages(p_set):
    averages = []
@@ -156,38 +164,23 @@ def get_predictor(prep = 0, proj = 1):
    PREP_SEASON = prep
    PROJ_SEASON = proj
    # get players from shelved player_store
-   (x_train, y_train, x_test, y_test, names_train) = get_player_sets()
-   model = get_model(len(x_train[0]), len(y_train[0]))
+   (X, Y) = get_player_sets()
+   model = get_model(len(X[0]), len(Y[0]))
    model.summary()
    print("\n\nGetting new model...")
-   print("Epochs: " + str(EPOCHS) + ", Batch Size: " + str(BATCH_SIZE) + "\n")
-   print("Metrics Glossary")
-   print("----------------")
-   print("MSE:          mean squared error = average of normalized error")
-   print("Validation:   mse accuracy of model predicting on validation set")
-   print("No Change:    prediction is player's stats will not change")
-   print("Regr to mean: prediction is player's stats will be halfway between their previous season")
-   print("                 and the league historic average for players in their correlated season")
-   print("Pseudo Rand:  prediction is player's prep season + 0% to 10% improvement")
-   print("Full Rand:    prediction is random float between 0.0 and 1.0 denormalized\n")
-   history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=0)
-   compare_acc(x_test, y_test, model)
-   #predictions = model.predict(x_test)
-   #print("[age, g, mpg, fga, fgp, 3pa, 3pp, 2pa, 2pp, fta, ftp, orb, drb, ast, stk, blk, tov, pf, ppg]")
-   #print(1)
-   #print(list(x_test[0]))
-   #print([round(x, 3) for x in predictions[0]])
-   #print(list(y_test[0]))
-   #print(2)
-   #print(list(x_test[1]))
-   #print([round(x, 3) for x in predictions[1]])
-   #print(list(y_test[1]))
-   return (model, names_train)
-   # p = players[2401]
-   # s = p.max_season
-   # print(p.name, s.age, s.ftp, s.threepa, s.ppg)
-   # print(x_train[0], y_train[0])
-   # print(x_test[0], y_test[0])
+   print("Epochs: " + str(EPOCHS) + ", Batch Size: " + str(BATCH_SIZE) + ", Folds: " + str(FOLDS) + "\n")
+   print_glossary()
+   kfold = StratifiedKFold(n_splits=FOLDS, shuffle=True)
+   scores = []
+   for i, (train, test) in enumerate(kfold.split(X, Y.argmax(1))):
+      model.fit(X[train], Y[train], epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=0)
+      score = model.evaluate(X[test], Y[test], verbose=0)
+      print("\nloss after fold " + str(i+1) + ": " + str(round(score, 5)))
+      scores.append(score)
+   print("\nave: " + str(round(sum(scores)/len(scores), 5)))
+   compare_acc(X, Y, model)
+   # predictions = model.predict(X)
+   return model
 
 
 # if __name__ == "__main__":
