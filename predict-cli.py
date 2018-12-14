@@ -97,8 +97,7 @@ def main():
       if (option != 'n' and option != 'p' and option != 'x' and option != 's'):
          print("Invalid option")
       elif (option == 'n'):
-         (m, n) = new_model()
-         model = m
+         model = new_model()
          print("Model replaced!")
       elif (option == 'p'):
          print("Getting prediction")
